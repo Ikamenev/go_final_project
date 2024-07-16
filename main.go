@@ -20,7 +20,7 @@ func main() {
 	r.Put("/api/task", handlers.TaskUpdatePUT)
 	r.Post("/api/task/done", handlers.TaskDonePOST)
 	r.Delete("/api/task", handlers.TaskDELETE)
-	fmt.Println("Сервер запущен")
+	fmt.Println("Сервер запущен, port:7540")
 
 	err := http.ListenAndServe(":7540", r)
 	if err != nil {

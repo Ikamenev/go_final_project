@@ -66,10 +66,10 @@ func InsertTask(task model.Task) (int, error) {
 	return int(id), nil
 }
 
-func ReadTasks() ([]model.Task, error) {
+func GetTasks() ([]model.Task, error) {
 	var tasks []model.Task
 
-	rows, err := db.Query("SELECT * FROM scheduler ORDER BY date")
+	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date ASC LIMIT 20")
 	if err != nil {
 		return []model.Task{}, err
 	}
@@ -84,7 +84,7 @@ func ReadTasks() ([]model.Task, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		return []model.Task{}, err
+		return nil, err
 	}
 
 	if tasks == nil {
@@ -98,7 +98,7 @@ func SearchTasks(search string) ([]model.Task, error) {
 	var tasks []model.Task
 
 	search = fmt.Sprintf("%%%s%%", search)
-	rows, err := db.Query("SELECT * FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date",
+	rows, err := db.Query("SELECT id, date, title, comment, repeat  FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date",
 		sql.Named("search", search))
 	if err != nil {
 		return []model.Task{}, err
@@ -118,7 +118,7 @@ func SearchTasks(search string) ([]model.Task, error) {
 	}
 
 	if tasks == nil {
-		tasks = []model.Task{}
+		tasks = nil
 	}
 
 	return tasks, nil
@@ -127,7 +127,7 @@ func SearchTasks(search string) ([]model.Task, error) {
 func SearchTasksByDate(date string) ([]model.Task, error) {
 	var tasks []model.Task
 
-	rows, err := db.Query("SELECT * FROM scheduler WHERE date = :date",
+	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = :date ASC LIMIT 15",
 		sql.Named("date", date))
 	if err != nil {
 		return []model.Task{}, err
@@ -156,7 +156,7 @@ func SearchTasksByDate(date string) ([]model.Task, error) {
 func ReadTask(id string) (model.Task, error) {
 	var task model.Task
 
-	row := db.QueryRow("SELECT * FROM scheduler WHERE id = :id",
+	row := db.QueryRow("SELECT id, date, title, comment, repeat  FROM scheduler WHERE id = :id",
 		sql.Named("id", id))
 	if err := row.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat); err != nil {
 		return model.Task{}, err

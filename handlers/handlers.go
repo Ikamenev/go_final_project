@@ -123,7 +123,7 @@ func TasksReadGET(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		err := errors.New("")
-		tasks, err = database.ReadTasks()
+		tasks, err = database.GetTasks()
 		if err != nil {
 			responseWithError(w, "failed to get tasks", err)
 			return
@@ -221,30 +221,9 @@ func TaskUpdatePUT(w http.ResponseWriter, r *http.Request) {
 }
 
 func TaskDonePOST(w http.ResponseWriter, r *http.Request) {
-	task, err := database.ReadTask(r.URL.Query().Get("id"))
+	task, err := validateTaskDonePost(w, r)
 	if err != nil {
-		responseWithError(w, "failed to get task", err)
 		return
-	}
-
-	if len(task.Repeat) == 0 {
-		err = database.DeleteTaskDb(task.Id)
-		if err != nil {
-			responseWithError(w, "failed to delete task", err)
-			return
-		}
-	} else {
-		task.Date, err = service.NextDate(time.Now(), task.Date, task.Repeat)
-		if err != nil {
-			responseWithError(w, "failed to get next date", err)
-			return
-		}
-
-		_, err = database.UpdateTask(task)
-		if err != nil {
-			responseWithError(w, "failed to update task", err)
-			return
-		}
 	}
 
 	tasksData, err := json.Marshal(struct{}{})
@@ -277,4 +256,33 @@ func TaskDELETE(w http.ResponseWriter, r *http.Request) {
 		responseWithError(w, "writing task error", err)
 		return
 	}
+}
+
+func validateTaskDonePost(w http.ResponseWriter, r *http.Request) (model.Task, error) {
+	task, err := database.ReadTask(r.URL.Query().Get("id"))
+	if err != nil {
+		responseWithError(w, "failed to get task", err)
+		return task, err
+	}
+
+	if len(task.Repeat) == 0 {
+		err = database.DeleteTaskDb(task.Id)
+		if err != nil {
+			responseWithError(w, "failed to delete task", err)
+			return task, err
+		}
+	} else {
+		task.Date, err = service.NextDate(time.Now(), task.Date, task.Repeat)
+		if err != nil {
+			responseWithError(w, "failed to get next date", err)
+			return task, err
+		}
+
+		_, err = database.UpdateTask(task)
+		if err != nil {
+			responseWithError(w, "failed to update task", err)
+			return task, err
+		}
+	}
+	return task, nil
 }
