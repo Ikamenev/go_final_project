@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+
 	"github.com/Ikamenev/database"
 	"github.com/Ikamenev/handlers"
-	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 func main() {
@@ -15,8 +17,8 @@ func main() {
 	r.Mount("/", http.FileServer(http.Dir("./web")))
 	r.Get("/api/nextdate", handlers.NextDate)
 	r.Post("/api/task", handlers.TaskAddPOST)
-	r.Get("/api/tasks", handlers.TasksReadGET)
-	r.Get("/api/task", handlers.TaskReadGET)
+	r.Get("/api/tasks", handlers.GetTasks)
+	r.Get("/api/task", handlers.GetTask)
 	r.Put("/api/task", handlers.TaskUpdatePUT)
 	r.Post("/api/task/done", handlers.TaskDonePOST)
 	r.Delete("/api/task", handlers.TaskDELETE)

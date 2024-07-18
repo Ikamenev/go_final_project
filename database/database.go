@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/Ikamenev/model"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/Ikamenev/model"
 )
 
 var db *sql.DB
@@ -98,7 +100,7 @@ func SearchTasks(search string) ([]model.Task, error) {
 	var tasks []model.Task
 
 	search = fmt.Sprintf("%%%s%%", search)
-	rows, err := db.Query("SELECT id, date, title, comment, repeat  FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date",
+	rows, err := db.Query("SELECT id, date, title, comment, repeat  FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date ASC LIMIT 20",
 		sql.Named("search", search))
 	if err != nil {
 		return []model.Task{}, err
@@ -127,7 +129,7 @@ func SearchTasks(search string) ([]model.Task, error) {
 func SearchTasksByDate(date string) ([]model.Task, error) {
 	var tasks []model.Task
 
-	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = :date ASC LIMIT 15",
+	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = :date ASC LIMIT 20",
 		sql.Named("date", date))
 	if err != nil {
 		return []model.Task{}, err

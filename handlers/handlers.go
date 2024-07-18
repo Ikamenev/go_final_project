@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Ikamenev/database"
-	"github.com/Ikamenev/model"
-	"github.com/Ikamenev/service"
-
-	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/Ikamenev/database"
+	"github.com/Ikamenev/model"
+	"github.com/Ikamenev/service"
 )
 
 func NextDate(w http.ResponseWriter, r *http.Request) {
@@ -102,14 +101,14 @@ func TaskAddPOST(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write(taskIdData)
-	log.Println(fmt.Sprintf("Added task with id=%d", taskId))
+	//log.Println(fmt.Sprintf("Added task with id=%d", taskId))
 
 	if err != nil {
 		responseWithError(w, "writing task id error", err)
 	}
 }
 
-func TasksReadGET(w http.ResponseWriter, r *http.Request) {
+func GetTasks(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("search")
 
 	var tasks []model.Task
@@ -134,14 +133,14 @@ func TasksReadGET(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(tasksData)
-	log.Println(fmt.Sprintf("Read %d tasks", len(tasks)))
+	//log.Println(fmt.Sprintf("Read %d tasks", len(tasks)))
 
 	if err != nil {
 		responseWithError(w, "writing tasks error", err)
 	}
 }
 
-func TaskReadGET(w http.ResponseWriter, r *http.Request) {
+func GetTask(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
 	task, err := database.ReadTask(id)
@@ -154,7 +153,7 @@ func TaskReadGET(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(tasksData)
-	log.Println(fmt.Sprintf("Read task with id=%s", id))
+	//log.Println(fmt.Sprintf("Read task with id=%s", id))
 
 	if err != nil {
 		responseWithError(w, "writing task error", err)
@@ -212,7 +211,7 @@ func TaskUpdatePUT(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(taskIdData)
-	log.Println(fmt.Sprintf("Updated task with id=%s", task.Id))
+	//log.Println(fmt.Sprintf("Updated task with id=%s", task.Id))
 
 	if err != nil {
 		responseWithError(w, "updating task error", err)
@@ -221,7 +220,7 @@ func TaskUpdatePUT(w http.ResponseWriter, r *http.Request) {
 }
 
 func TaskDonePOST(w http.ResponseWriter, r *http.Request) {
-	task, err := validateTaskDonePost(w, r)
+	_, err := validateTaskDonePost(w, r)
 	if err != nil {
 		return
 	}
@@ -230,7 +229,7 @@ func TaskDonePOST(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(tasksData)
-	log.Println(fmt.Sprintf("Done task with id=%s", task.Id))
+	//log.Println(fmt.Sprintf("Done task with id=%s", task.Id))
 
 	if err != nil {
 		responseWithError(w, "writing task error", err)
@@ -250,7 +249,7 @@ func TaskDELETE(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(tasksData)
-	log.Println(fmt.Sprintf("Deleted task with id=%s", id))
+	//log.Println(fmt.Sprintf("Deleted task with id=%s", id))
 
 	if err != nil {
 		responseWithError(w, "writing task error", err)
